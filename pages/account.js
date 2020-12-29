@@ -1,26 +1,37 @@
 import {API} from '../services/fitbit/api'
-import FitbitOAuth from '../services/fitbit/oauth'
+import { withRouter } from 'next/router'
+import queryString from 'query-string'
 
-export default function handler(req, res) {
-  console.log('req: ', req)
-  console.log('req.code: ', req.url.query.code)
-
-  let tokens = {}
-  if (req.url.query.code) {
-    API.prototype.getAuthToken(req.url.query.code)
+class Handler extends React.Component {
+  constructor(props) {
+    super(props);
   }
 
-  function getSteps() {
+  componentDidMount() {
+    const { router } = this.props
+    if (router.asPath) {
+      const parsed = queryString.parseUrl(router.asPath)
+      console.log('parsed: ', parsed.query)
+      API.prototype.getAuthToken(parsed.query.code)
+      router.push('/account', '/account', { shallow: true })
+    }
+  }
+
+  getSteps() {
     API.prototype.getSteps()
   }
 
-  return (
-    <div>
-        Create Account!
-        <API/>
-        <div>
-            <button onClick={getSteps}>Get Steps</button>
-        </div>
-    </div>
-  )
+  render() {
+    return (
+      <div>
+          Create Account!
+          <API/>
+          <div>
+              <button onClick={this.getSteps}>Get Steps</button>
+          </div>
+      </div>
+    )
+  }
 }
+
+export default withRouter(Handler)
